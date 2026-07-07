@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IndustriAndes — Biblioteca de Conocimiento</title>
+<style>
+  :root {
+    --grafito: #1E2328;
+    --grafito-suave: #2B3138;
+    --acero: #4A5560;
+    --acero-claro: #8B96A1;
+    --hueso: #F2F0EB;
+    --naranja: #E06C2C;
+    --naranja-oscuro: #C25A20;
+    --exito: #4A7A5C;
+    --borde: #3A4048;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--hueso);
+    color: var(--grafito);
+    min-height: 100vh;
+  }
+
+  /* ---------- LOGIN ---------- */
+  #login-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--grafito);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 0.4s ease;
+  }
+
+  #login-screen.oculto {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .login-card {
+    background: var(--grafito-suave);
+    border: 1px solid var(--borde);
+    border-radius: 4px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+  }
+
+  .login-marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .login-marca .barra {
+    width: 4px;
+    height: 28px;
+    background: var(--naranja);
+  }
+
+  .login-card h1 {
+    color: var(--hueso);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .login-card p.subtitulo {
+    color: var(--acero-claro);
+    font-size: 13px;
+    margin-top: 6px;
+    margin-bottom: 32px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .login-card input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 3px;
+    border: 1px solid var(--borde);
+    background: var(--grafito);
+    color: var(--hueso);
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+
+  .login-card input:focus {
+    outline: none;
+    border-color: var(--naranja);
+  }
+
+  .login-card button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 3px;
+    border: none;
+    background: var(--naranja);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .login-card button:hover { background: var(--naranja-oscuro); }
+
+  #login-error {
+    color: #E5877A;
+    font-size: 13px;
+    margin-top: 12px;
+    min-height: 16px;
+  }
+
+  .login-footer {
+    margin-top: 28px;
+    color: var(--acero);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ---------- APP ---------- */
+  #app { display: none; }
+  #app.visible { display: block; }
+
+  header {
+    background: var(--grafito);
+    padding: 28px 24px;
+    border-bottom: 3px solid var(--naranja);
+  }
+
+  .marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .marca .barra {
+    width: 4px;
+    height: 26px;
+    background: var(--naranja);
+  }
+
+  header h1 {
+    color: var(--hueso);
+    font-size: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  header p {
+    color: var(--acero-claro);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 4px;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 14px;
+  }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+
+  .buscador {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .buscador input {
+    flex: 1;
+    padding: 14px 16px;
+    border-radius: 3px;
+    border: 1px solid var(--acero-claro);
+    font-size: 15px;
+    background: white;
+  }
+
+  .buscador input:focus {
+    outline: none;
+    border-color: var(--naranja);
+  }
+
+  .buscador button {
+    padding: 14px 24px;
+    border-radius: 3px;
+    border: none;
+    background: var(--grafito);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .buscador button:hover { background: var(--naranja); }
+  .buscador button:disabled { background: var(--acero-claro); cursor: default; }
+
+  .sugerencias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .sugerencias span {
+    font-size: 12px;
+    color: var(--acero);
+    padding: 6px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 20px;
+    cursor: pointer;
+    background: white;
+  }
+
+  .sugerencias span:hover {
+    border-color: var(--naranja);
+    color: var(--naranja-oscuro);
+  }
+
+  #estado {
+    text-align: center;
+    color: var(--acero);
+    font-size: 14px;
+    padding: 40px 0;
+  }
+
+  .resultado {
+    background: white;
+    border: 1px solid var(--borde);
+    border-left: 4px solid var(--naranja);
+    border-radius: 3px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+
+  .resultado-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .resultado h3 {
+    font-size: 16px;
+    color: var(--grafito);
+    line-height: 1.4;
+  }
+
+  .etiqueta {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  .etiqueta.alta { background: #E9F2EC; color: var(--exito); }
+  .etiqueta.media { background: #FBEEE4; color: var(--naranja-oscuro); }
+
+  .resultado .meta {
+    font-size: 12px;
+    color: var(--acero);
+    margin-bottom: 10px;
+  }
+
+  .resultado .meta b { color: var(--grafito); }
+
+  .resultado p.descripcion {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .resultado .acciones {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .resultado a.enlace {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--naranja-oscuro);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid var(--naranja);
+    border-radius: 3px;
+  }
+
+  .resultado a.enlace:hover { background: var(--naranja); color: white; }
+
+  .resultado .acceso {
+    font-size: 12px;
+    color: var(--acero);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hueso);
+  }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-marca"><div class="barra"></div></div>
+    <h1>INDUSTRIANDES</h1>
+    <p class="subtitulo">Biblioteca de Conocimiento</p>
+    <input type="password" id="password-input" placeholder="Contraseña de acceso" autocomplete="off">
+    <button onclick="verificarAcceso()">Ingresar</button>
+    <div id="login-error"></div>
+    <div class="login-footer">Powered by Partner Estratégico</div>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="marca">
+      <div class="barra"></div>
+      <h1>INDUSTRIANDES</h1>
+    </div>
+    <p>Biblioteca de Conocimiento</p>
+  </header>
+
+  <main>
+    <div class="buscador">
+      <input type="text" id="pregunta-input" placeholder="Ej: ¿cómo se hace la conciliación bancaria?" autocomplete="off">
+      <button id="buscar-btn" onclick="buscar()">Buscar</button>
+    </div>
+
+    <div class="sugerencias">
+      <span onclick="buscarSugerencia(this)">control de calidad</span>
+      <span onclick="buscarSugerencia(this)">pago a proveedores</span>
+      <span onclick="buscarSugerencia(this)">inventario</span>
+      <span onclick="buscarSugerencia(this)">recepción de mercancía</span>
+      <span onclick="buscarSugerencia(this)">despacho de pedidos</span>
+    </div>
+
+    <div id="estado">Escribe una pregunta para buscar en la biblioteca.</div>
+    <div id="resultados"></div>
+  </main>
+</div>
+
+<script>
+  const CONTRASENA_CORRECTA = "IndustriAndes2026";
+  const WORKER_URL = "https://industriandes-biblioteca-api.jasv0808.workers.dev";
+
+  function verificarAcceso() {
+    const input = document.getElementById("password-input");
+    const error = document.getElementById("login-error");
+    if (input.value === CONTRASENA_CORRECTA) {
+      document.getElementById("login-screen").classList.add("oculto");
+      setTimeout(() => {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app").classList.add("visible");
+        document.getElementById("pregunta-input").focus();
+      }, 400);
+    } else {
+      error.textContent = "Contraseña incorrecta. Intenta de nuevo.";
+      input.value = "";
+      input.focus();
+    }
+  }
+
+  document.getElementById("password-input").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") verificarAcceso();
+  });
+
+  document.getElementById("pregunta-input").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") buscar();
+  });
+
+  function buscarSugerencia(el) {
+    document.getElementById("pregunta-input").value = el.textContent;
+    buscar();
+  }
+
+  async function buscar() {
+    const pregunta = document.getElementById("pregunta-input").value.trim();
+    const estado = document.getElementById("estado");
+    const resultadosDiv = document.getElementById("resultados");
+    const boton = document.getElementById("buscar-btn");
+
+    if (!pregunta) return;
+
+    boton.disabled = true;
+    boton.textContent = "Buscando...";
+    estado.style.display = "block";
+    estado.textContent = "Consultando la biblioteca con IA, un momento...";
+    resultadosDiv.innerHTML = "";
+
+    try {
+      const respuesta = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pregunta })
+      });
+
+      const datos = await respuesta.json();
+
+      if (datos.error) {
+        estado.textContent = "Ocurrió un error: " + datos.error;
+        return;
+      }
+
+      const resultados = datos.resultados || [];
+
+      if (resultados.length === 0) {
+        estado.textContent = "No se encontraron procesos relacionados con tu búsqueda.";
+        return;
+      }
+
+      estado.style.display = "none";
+      resultadosDiv.innerHTML = resultados.map(r => renderResultado(r)).join("");
+
+    } catch (err) {
+      estado.textContent = "No se pudo conectar con la biblioteca. Intenta de nuevo en unos segundos.";
+    } finally {
+      boton.disabled = false;
+      boton.textContent = "Buscar";
+    }
+  }
+
+  function renderResultado(r) {
+    const relevancia = (r.relevancia || "media").toLowerCase();
+    const etiquetaTexto = relevancia === "alta" ? "Alta relevancia" : "Relacionado";
+
+    const tieneVideo = r.Enlace_Video && r.Enlace_Video.toString().trim() !== "" && r.Enlace_Video.toLowerCase() !== "no aplica";
+    const tieneDocumento = r.Enlace_Documento && r.Enlace_Documento.toString().trim() !== "" && r.Enlace_Documento.toLowerCase() !== "no aplica";
+
+    let acciones = "";
+    if (tieneVideo) {
+      const url = r.Enlace_Video.startsWith("http") ? r.Enlace_Video : "#";
+      acciones += `<a class="enlace" href="${url}" target="_blank">▶ Ver video</a>`;
+    }
+    if (tieneDocumento) {
+      const url = r.Enlace_Documento.startsWith("http") ? r.Enlace_Documento : "#";
+      acciones += `<a class="enlace" href="${url}" target="_blank">↗ Ver documento</a>`;
+    }
+
+    return `
+      <div class="resultado">
+        <div class="resultado-header">
+          <h3>${escapeHtml(r.Titulo || "Sin título")}</h3>
+          <span class="etiqueta ${relevancia}">${etiquetaTexto}</span>
+        </div>
+        <div class="meta"><b>${escapeHtml(r.Tipo || "")}</b> · ${escapeHtml(r.Proceso || "")}</div>
+        <p class="descripcion">${escapeHtml(r.Descripcion || "")}</p>
+        <div class="acciones">${acciones || '<span style="font-size:13px;color:var(--acero);">Sin enlace disponible</span>'}</div>
+        ${r.Acceso ? `<div class="acceso"><b>Acceso:</b> ${escapeHtml(r.Acceso)}</div>` : ""}
+      </div>
+    `;
+  }
+
+  function escapeHtml(texto) {
+    const div = document.createElement("div");
+    div.textContent = texto;
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>
